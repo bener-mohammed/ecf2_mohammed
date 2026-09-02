@@ -1,0 +1,144 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\TraineeRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: TraineeRepository::class)]
+#[ORM\Table(name: 'trainee')]
+#[ORM\UniqueConstraint(name: 'uq_trainee_afpa_id', columns: ['afpa_id'])]
+#[ORM\UniqueConstraint(name: 'uq_trainee_email', columns: ['email'])]
+class Trainee
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'trainee_id', options: ['unsigned' => true])]
+    private ?int $id = null;
+
+    #[ORM\Column(name: 'afpa_id', length: 20)]
+    private ?string $afpaId = null;
+
+    #[ORM\Column(name: 'first_name', length: 100)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(name: 'last_name', length: 100)]
+    private ?string $lastName = null;
+
+    #[ORM\Column(name: 'email', length: 180)]
+    private ?string $email = null;
+
+    #[ORM\Column(name: 'phone', length: 20)]
+    private ?string $phone = null;
+
+    #[ORM\Column(name: 'residence', length: 100, nullable: true)]
+    private ?string $residence = null;
+
+    #[ORM\Column(name: 'birth_date', type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $birthDate = null;
+
+    #[ORM\Column(name: 'photo_filename', length: 255, nullable: true)]
+    private ?string $photoFilename = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getAfpaId(): ?string
+    {
+        return $this->afpaId;
+    }
+
+    public function setAfpaId(string $afpaId): static
+    {
+        $this->afpaId = $afpaId;
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): static
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): static
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $phone): static
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getResidence(): ?string
+    {
+        return $this->residence;
+    }
+
+    public function setResidence(?string $residence): static
+    {
+        $this->residence = $residence;
+
+        return $this;
+    }
+
+    public function getBirthDate(): ?\DateTimeImmutable
+    {
+        return $this->birthDate;
+    }
+
+    public function setBirthDate(\DateTimeImmutable $birthDate): static
+    {
+        $this->birthDate = $birthDate;
+
+        return $this;
+    }
+
+    public function getPhotoFilename(): ?string
+    {
+        return $this->photoFilename;
+    }
+
+    public function setPhotoFilename(?string $photoFilename): static
+    {
+        $this->photoFilename = $photoFilename;
+
+        return $this;
+    }
+}
