@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Trombinoscope des stagiaires{% endblock %}
+
+{% block body %}
+    <h1>Trombinoscope des stagiaires</h1>
+
+    <p>Nombre de stagiaires : {{ trainees|length }}</p>
+
+    <ul>
+        {% for trainee in trainees %}
+            <li>
+                {{ trainee.firstName }} {{ trainee.lastName }}
+            </li>
+        {% else %}
+            <li>Aucun stagiaire trouvé.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
