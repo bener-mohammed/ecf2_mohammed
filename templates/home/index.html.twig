@@ -3,17 +3,78 @@
 {% block title %}Trombinoscope des stagiaires{% endblock %}
 
 {% block body %}
-    <h1>Trombinoscope des stagiaires</h1>
+    <main class="container py-4">
 
-    <p>Nombre de stagiaires : {{ trainees|length }}</p>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 mb-1">Trombinoscope des stagiaires</h1>
+                <p class="text-body-secondary mb-0">
+                    {{ trainees|length }} stagiaires
+                </p>
+            </div>
+        </div>
 
-    <ul>
-        {% for trainee in trainees %}
-            <li>
-                {{ trainee.firstName }} {{ trainee.lastName }}
-            </li>
-        {% else %}
-            <li>Aucun stagiaire trouvé.</li>
-        {% endfor %}
-    </ul>
+        <div class="row g-4">
+
+            {% for trainee in trainees %}
+
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+
+                    <article class="card h-100 shadow-sm">
+
+                        <div class="card-body text-center">
+
+                            {% if trainee.photoFilename %}
+
+                                <img
+                                    src="{{ asset('uploads/trainees/' ~ trainee.photoFilename) }}"
+                                    alt="Photo de {{ trainee.firstName }} {{ trainee.lastName }}"
+                                    class="rounded-circle mb-3"
+                                    width="120"
+                                    height="120"
+                                    style="object-fit: cover;"
+                                >
+
+                            {% else %}
+
+                                <div
+                                    class="rounded-circle bg-secondary text-white
+                                           d-flex align-items-center justify-content-center
+                                           mx-auto mb-3"
+                                    style="width: 120px; height: 120px; font-size: 2rem;"
+                                >
+                                    {{ trainee.firstName|first|upper }}
+                                    {{ trainee.lastName|first|upper }}
+                                </div>
+
+                            {% endif %}
+
+                            <h2 class="h5 card-title mb-1">
+                                {{ trainee.firstName }}
+                                {{ trainee.lastName }}
+                            </h2>
+
+                            <p class="text-body-secondary small mb-0">
+                                ID AFPA : {{ trainee.afpaId }}
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            {% else %}
+
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        Aucun stagiaire trouvé.
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </main>
 {% endblock %}
