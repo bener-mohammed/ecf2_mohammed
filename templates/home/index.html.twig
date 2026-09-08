@@ -57,6 +57,16 @@
                             <p class="text-body-secondary small mb-0">
                                 ID AFPA : {{ trainee.afpaId }}
                             </p>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <div class="mt-3">
+                                    <a
+                                        href="{{ path('app_absence_new', {'id': trainee.id}) }}"
+                                        class="btn btn-primary btn-sm"
+                                    >
+                                        Ajouter une absence
+                                    </a>
+                                </div>
+                            {% endif %}
 
                         </div>
 
