@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier une absence{% endblock %}
+
+{% block body %}
+    <main class="container py-4">
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+
+                        <h1 class="h3 mb-3">
+                            Modifier une absence
+                        </h1>
+
+                        <p class="text-body-secondary mb-4">
+                            Stagiaire :
+                            <strong>
+                                {{ absence.trainee.firstName }}
+                                {{ absence.trainee.lastName }}
+                            </strong>
+                        </p>
+
+                        {{ form_start(form) }}
+
+                            {{ form_errors(form) }}
+
+                            <div class="mb-3">
+                                {{ form_label(form.absenceDate) }}
+                                {{ form_widget(form.absenceDate, {
+                                    'attr': {
+                                        'class': 'form-control'
+                                    }
+                                }) }}
+                                {{ form_errors(form.absenceDate) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.reason) }}
+                                {{ form_widget(form.reason, {
+                                    'attr': {
+                                        'class': 'form-select'
+                                    }
+                                }) }}
+                                {{ form_errors(form.reason) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.proofFile) }}
+                                {{ form_widget(form.proofFile, {
+                                    'attr': {
+                                        'class': 'form-control'
+                                    }
+                                }) }}
+                                {{ form_errors(form.proofFile) }}
+
+                                <div class="form-text">
+                                    Facultatif — fichier PDF, 5 Mo maximum.
+                                </div>
+                            </div>
+
+                            {% if absence.proofFilename %}
+                                <div class="alert alert-light border mb-4">
+                                    <strong>Justificatif actuel :</strong>
+
+                                    <a
+                                        href="{{ asset('uploads/proofs/' ~ absence.proofFilename) }}"
+                                        target="_blank"
+                                        class="ms-2"
+                                    >
+                                        Voir le PDF
+                                    </a>
+                                </div>
+                            {% endif %}
+
+                            <div class="d-flex gap-2">
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                >
+                                    Enregistrer les modifications
+                                </button>
+
+                                <a
+                                    href="{{ path('app_absence_index') }}"
+                                    class="btn btn-outline-secondary"
+                                >
+                                    Annuler
+                                </a>
+                            </div>
+
+                        {{ form_end(form) }}
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+{% endblock %}

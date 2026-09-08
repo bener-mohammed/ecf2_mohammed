@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Repository\AbsenceRepository;
 use App\Entity\Absence;
 use App\Form\AbsenceType;
+use App\Repository\AbsenceRepository;
 use App\Repository\TraineeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,18 +16,18 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class AbsenceController extends AbstractController
 {
-    #[Route(
-        '/admin/trainees/{id}/absence/new',
-        name: 'app_absence_new',
-        methods: ['GET', 'POST']
-    )]
+    /*
+     * READ
+     * Display all absences.
+     */
     #[Route(
         '/admin/absences',
         name: 'app_absence_index',
         methods: ['GET']
     )]
-    public function index(AbsenceRepository $absenceRepository): Response
-    {
+    public function index(
+        AbsenceRepository $absenceRepository
+    ): Response {
         $absences = $absenceRepository->findBy(
             [],
             ['absenceDate' => 'DESC']
@@ -37,6 +37,16 @@ final class AbsenceController extends AbstractController
             'absences' => $absences,
         ]);
     }
+
+    /*
+     * CREATE
+     * Create a new absence for a specific trainee.
+     */
+    #[Route(
+        '/admin/trainees/{id}/absence/new',
+        name: 'app_absence_new',
+        methods: ['GET', 'POST']
+    )]
     public function new(
         int $id,
         TraineeRepository $traineeRepository,
@@ -46,23 +56,30 @@ final class AbsenceController extends AbstractController
         $trainee = $traineeRepository->find($id);
 
         if (!$trainee) {
-            throw $this->createNotFoundException('Stagiaire introuvable.');
+            throw $this->createNotFoundException(
+                'Stagiaire introuvable.'
+            );
         }
 
         $absence = new Absence();
 
         $absence->setTrainee($trainee);
 
-        $form = $this->createForm(AbsenceType::class, $absence);
+        $form = $this->createForm(
+            AbsenceType::class,
+            $absence
+        );
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $proofFile = $form->get('proofFile')->getData();
+            $proofFile = $form
+                ->get('proofFile')
+                ->getData();
 
             if ($proofFile) {
-                $newFilename = bin2hex(random_bytes(16)) . '.pdf';
+                $newFilename =
+                    bin2hex(random_bytes(16)) . '.pdf';
 
                 $proofsDirectory =
                     $this->getParameter('kernel.project_dir')
@@ -74,18 +91,25 @@ final class AbsenceController extends AbstractController
                         $newFilename
                     );
 
-                    $absence->setProofFilename($newFilename);
-                } catch (FileException $exception) {
-                    $form->get('proofFile')->addError(
-                        new FormError(
-                            'Le justificatif n\'a pas pu être enregistré.'
-                        )
+                    $absence->setProofFilename(
+                        $newFilename
                     );
+                } catch (FileException $exception) {
+                    $form
+                        ->get('proofFile')
+                        ->addError(
+                            new FormError(
+                                'Le justificatif n\'a pas pu être enregistré.'
+                            )
+                        );
 
-                    return $this->render('absence/new.html.twig', [
-                        'form' => $form->createView(),
-                        'trainee' => $trainee,
-                    ]);
+                    return $this->render(
+                        'absence/new.html.twig',
+                        [
+                            'form' => $form->createView(),
+                            'trainee' => $trainee,
+                        ]
+                    );
                 }
             }
 
@@ -97,12 +121,123 @@ final class AbsenceController extends AbstractController
                 'L\'absence a bien été enregistrée.'
             );
 
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute(
+                'app_home'
+            );
         }
 
-        return $this->render('absence/new.html.twig', [
-            'form' => $form->createView(),
-            'trainee' => $trainee,
-        ]);
+        return $this->render(
+            'absence/new.html.twig',
+            [
+                'form' => $form->createView(),
+                'trainee' => $trainee,
+            ]
+        );
+    }
+
+    /*
+     * UPDATE
+     * Edit an existing absence.
+     */
+    #[Route(
+        '/admin/absences/{id}/edit',
+        name: 'app_absence_edit',
+        methods: ['GET', 'POST']
+    )]
+    public function edit(
+        int $id,
+        AbsenceRepository $absenceRepository,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $absence = $absenceRepository->find($id);
+
+        if (!$absence) {
+            throw $this->createNotFoundException(
+                'Absence introuvable.'
+            );
+        }
+
+        $oldProofFilename =
+            $absence->getProofFilename();
+
+        $form = $this->createForm(
+            AbsenceType::class,
+            $absence
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $proofFile = $form
+                ->get('proofFile')
+                ->getData();
+
+            if ($proofFile) {
+                $newFilename =
+                    bin2hex(random_bytes(16)) . '.pdf';
+
+                $proofsDirectory =
+                    $this->getParameter('kernel.project_dir')
+                    . '/public/uploads/proofs';
+
+                try {
+                    $proofFile->move(
+                        $proofsDirectory,
+                        $newFilename
+                    );
+
+                    $absence->setProofFilename(
+                        $newFilename
+                    );
+
+                    if ($oldProofFilename) {
+                        $oldProofPath =
+                            $proofsDirectory
+                            . '/'
+                            . $oldProofFilename;
+
+                        if (is_file($oldProofPath)) {
+                            unlink($oldProofPath);
+                        }
+                    }
+                } catch (FileException $exception) {
+                    $form
+                        ->get('proofFile')
+                        ->addError(
+                            new FormError(
+                                'Le nouveau justificatif n\'a pas pu être enregistré.'
+                            )
+                        );
+
+                    return $this->render(
+                        'absence/edit.html.twig',
+                        [
+                            'form' => $form->createView(),
+                            'absence' => $absence,
+                        ]
+                    );
+                }
+            }
+
+            $entityManager->flush();
+
+            $this->addFlash(
+                'success',
+                'L\'absence a bien été modifiée.'
+            );
+
+            return $this->redirectToRoute(
+                'app_absence_index'
+            );
+        }
+
+        return $this->render(
+            'absence/edit.html.twig',
+            [
+                'form' => $form->createView(),
+                'absence' => $absence,
+            ]
+        );
     }
 }

@@ -33,6 +33,7 @@
                             <th>Stagiaire</th>
                             <th>Motif</th>
                             <th>Justificatif</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
 
@@ -78,6 +79,14 @@
                                             Aucun
                                         </span>
                                     {% endif %}
+                                </td>
+                                <td>
+                                    <a
+                                    href="{{ path('app_absence_edit', {'id': absence.id}) }}"
+                                    class="btn btn-sm btn-warning"
+                                    >
+                                        Modifier
+                                    </a>
                                 </td>
                             </tr>
 
