@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\AbsenceRepository;
 use App\Entity\Absence;
 use App\Form\AbsenceType;
 use App\Repository\TraineeRepository;
@@ -20,6 +21,22 @@ final class AbsenceController extends AbstractController
         name: 'app_absence_new',
         methods: ['GET', 'POST']
     )]
+    #[Route(
+        '/admin/absences',
+        name: 'app_absence_index',
+        methods: ['GET']
+    )]
+    public function index(AbsenceRepository $absenceRepository): Response
+    {
+        $absences = $absenceRepository->findBy(
+            [],
+            ['absenceDate' => 'DESC']
+        );
+
+        return $this->render('absence/index.html.twig', [
+            'absences' => $absences,
+        ]);
+    }
     public function new(
         int $id,
         TraineeRepository $traineeRepository,
@@ -58,7 +75,6 @@ final class AbsenceController extends AbstractController
                     );
 
                     $absence->setProofFilename($newFilename);
-
                 } catch (FileException $exception) {
                     $form->get('proofFile')->addError(
                         new FormError(

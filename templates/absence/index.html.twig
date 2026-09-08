@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des absences{% endblock %}
+
+{% block body %}
+    <main class="container py-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 mb-1">Gestion des absences</h1>
+
+                <p class="text-body-secondary mb-0">
+                    {{ absences|length }} absence(s) enregistrée(s)
+                </p>
+            </div>
+
+            <a
+                href="{{ path('app_home') }}"
+                class="btn btn-outline-secondary"
+            >
+                Retour au trombinoscope
+            </a>
+        </div>
+
+        {% if absences is not empty %}
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Stagiaire</th>
+                            <th>Motif</th>
+                            <th>Justificatif</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for absence in absences %}
+
+                            <tr>
+                                <td>
+                                    {{ absence.absenceDate|date('d/m/Y') }}
+                                </td>
+
+                                <td>
+                                    {{ absence.trainee.firstName }}
+                                    {{ absence.trainee.lastName }}
+                                </td>
+
+                                <td>
+                                    {% if absence.reason == 'illness' %}
+                                        Maladie
+                                    {% elseif absence.reason == 'unexcused' %}
+                                        Sans motif
+                                    {% elseif absence.reason == 'legal_leave' %}
+                                        Absence légale
+                                    {% elseif absence.reason == 'work_accident' %}
+                                        Accident du travail
+                                    {% else %}
+                                        {{ absence.reason }}
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if absence.proofFilename %}
+                                        <a
+                                            href="{{ asset('uploads/proofs/' ~ absence.proofFilename) }}"
+                                            target="_blank"
+                                            class="btn btn-sm btn-outline-primary"
+                                        >
+                                            Voir le PDF
+                                        </a>
+                                    {% else %}
+                                        <span class="text-body-secondary">
+                                            Aucun
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-info">
+                Aucune absence enregistrée.
+            </div>
+
+        {% endif %}
+
+    </main>
+{% endblock %}
