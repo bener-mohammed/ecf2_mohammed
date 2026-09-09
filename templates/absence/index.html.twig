@@ -82,11 +82,31 @@
                                 </td>
                                 <td>
                                     <a
-                                    href="{{ path('app_absence_edit', {'id': absence.id}) }}"
-                                    class="btn btn-sm btn-warning"
+                                        href="{{ path('app_absence_edit', {'id': absence.id}) }}"
+                                        class="btn btn-sm btn-warning"
                                     >
                                         Modifier
                                     </a>
+
+                                    <form
+                                        method="post"
+                                        action="{{ path('app_absence_delete', {'id': absence.id}) }}"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Voulez-vous vraiment supprimer cette absence ?');"
+                                    >
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value="{{ csrf_token('delete' ~ absence.id) }}"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-danger"
+                                        >
+                                            Supprimer
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
 

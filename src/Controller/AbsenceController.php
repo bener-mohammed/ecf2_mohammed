@@ -240,4 +240,57 @@ final class AbsenceController extends AbstractController
             ]
         );
     }
+    #[Route(
+        '/admin/absences/{id}/delete',
+        name: 'app_absence_delete',
+        methods: ['POST']
+    )]
+    public function delete(
+        int $id,
+        AbsenceRepository $absenceRepository,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $absence = $absenceRepository->find($id);
+
+        if (!$absence) {
+            throw $this->createNotFoundException(
+                'Absence introuvable.'
+            );
+        }
+
+        if (!$this->isCsrfTokenValid(
+            'delete' . $absence->getId(),
+            $request->request->get('_token')
+        )) {
+            throw $this->createAccessDeniedException(
+                'Jeton CSRF invalide.'
+            );
+        }
+
+        $proofFilename = $absence->getProofFilename();
+
+        $entityManager->remove($absence);
+        $entityManager->flush();
+
+        if ($proofFilename) {
+            $proofPath =
+                $this->getParameter('kernel.project_dir')
+                . '/public/uploads/proofs/'
+                . $proofFilename;
+
+            if (is_file($proofPath)) {
+                unlink($proofPath);
+            }
+        }
+
+        $this->addFlash(
+            'success',
+            'L\'absence a bien été supprimée.'
+        );
+
+        return $this->redirectToRoute(
+            'app_absence_index'
+        );
+    }
 }
