@@ -1,13 +1,57 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Trainee{% endblock %}
+{% block title %}Modifier un stagiaire{% endblock %}
 
 {% block body %}
-    <h1>Edit Trainee</h1>
+    <main class="container py-4">
 
-    {{ include('trainee/_form.html.twig', {'button_label': 'Update'}) }}
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
 
-    <a href="{{ path('app_trainee_index') }}">back to list</a>
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
 
-    {{ include('trainee/_delete_form.html.twig') }}
+                        <h1 class="h3 mb-4">
+                            Modifier un stagiaire
+                        </h1>
+
+                        {% if trainee.photoFilename %}
+                            <div class="mb-4">
+                                <p class="mb-2">
+                                    <strong>Photo actuelle :</strong>
+                                </p>
+
+                                <img
+                                    src="{{ asset('uploads/trainees/' ~ trainee.photoFilename) }}"
+                                    alt="Photo de {{ trainee.firstName }} {{ trainee.lastName }}"
+                                    class="rounded"
+                                    width="120"
+                                    height="120"
+                                    style="object-fit: cover;"
+                                >
+                            </div>
+                        {% else %}
+                            <div class="alert alert-light border mb-4">
+                                Aucune photo enregistrée pour ce stagiaire.
+                            </div>
+                        {% endif %}
+
+                        {{ include('trainee/_form.html.twig', {
+                            'button_label': 'Enregistrer les modifications'
+                        }) }}
+
+                        <a
+                            href="{{ path('app_trainee_index') }}"
+                            class="btn btn-outline-secondary mt-3"
+                        >
+                            Annuler
+                        </a>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
 {% endblock %}

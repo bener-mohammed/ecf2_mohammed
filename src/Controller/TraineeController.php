@@ -117,21 +117,99 @@ final class TraineeController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_trainee_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Trainee $trainee, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(TraineeType::class, $trainee);
+    public function edit(
+        Request $request,
+        Trainee $trainee,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $oldPhotoFilename = $trainee->getPhotoFilename();
+
+        $form = $this->createForm(
+            TraineeType::class,
+            $trainee
+        );
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $photoFile = $form
+                ->get('photoFile')
+                ->getData();
+
+            $newFilename = null;
+            $photosDirectory =
+                $this->getParameter('kernel.project_dir')
+                . '/public/uploads/trainees';
+
+            if ($photoFile) {
+                $extension =
+                    $photoFile->guessExtension() ?: 'jpg';
+
+                $newFilename =
+                    bin2hex(random_bytes(16))
+                    . '.'
+                    . $extension;
+
+                try {
+                    $photoFile->move(
+                        $photosDirectory,
+                        $newFilename
+                    );
+
+                    $trainee->setPhotoFilename(
+                        $newFilename
+                    );
+                } catch (FileException $exception) {
+                    $form
+                        ->get('photoFile')
+                        ->addError(
+                            new FormError(
+                                'La nouvelle photo n\'a pas pu être enregistrée.'
+                            )
+                        );
+
+                    return $this->render(
+                        'trainee/edit.html.twig',
+                        [
+                            'trainee' => $trainee,
+                            'form' => $form,
+                        ]
+                    );
+                }
+            }
+
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_trainee_index', [], Response::HTTP_SEE_OTHER);
+            if ($newFilename && $oldPhotoFilename) {
+                $oldPhotoPath =
+                    $photosDirectory
+                    . '/'
+                    . $oldPhotoFilename;
+
+                if (is_file($oldPhotoPath)) {
+                    unlink($oldPhotoPath);
+                }
+            }
+
+            $this->addFlash(
+                'success',
+                'Le stagiaire a bien été modifié.'
+            );
+
+            return $this->redirectToRoute(
+                'app_trainee_index',
+                [],
+                Response::HTTP_SEE_OTHER
+            );
         }
 
-        return $this->render('trainee/edit.html.twig', [
-            'trainee' => $trainee,
-            'form' => $form,
-        ]);
+        return $this->render(
+            'trainee/edit.html.twig',
+            [
+                'trainee' => $trainee,
+                'form' => $form,
+            ]
+        );
     }
 
     #[Route('/{id}', name: 'app_trainee_delete', methods: ['POST'])]
