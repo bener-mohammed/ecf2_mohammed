@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Trainee index{% endblock %}
+
+{% block body %}
+    <h1>Trainee index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>AfpaId</th>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Residence</th>
+                <th>BirthDate</th>
+                <th>PhotoFilename</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for trainee in trainees %}
+            <tr>
+                <td>{{ trainee.id }}</td>
+                <td>{{ trainee.afpaId }}</td>
+                <td>{{ trainee.firstName }}</td>
+                <td>{{ trainee.lastName }}</td>
+                <td>{{ trainee.email }}</td>
+                <td>{{ trainee.phone }}</td>
+                <td>{{ trainee.residence }}</td>
+                <td>{{ trainee.birthDate ? trainee.birthDate|date('Y-m-d') : '' }}</td>
+                <td>{{ trainee.photoFilename }}</td>
+                <td>
+                    <a href="{{ path('app_trainee_show', {'id': trainee.id}) }}">show</a>
+                    <a href="{{ path('app_trainee_edit', {'id': trainee.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_trainee_new') }}">Create new</a>
+{% endblock %}
