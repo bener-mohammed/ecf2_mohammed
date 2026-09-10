@@ -18,3 +18,12 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+
+# Uploaded trainee photos
+/public/uploads/trainees/*
+!/public/uploads/trainees/.gitkeep
+
+# Uploaded absence proofs
+/public/uploads/proofs/*
+!/public/uploads/proofs/.gitkeep
