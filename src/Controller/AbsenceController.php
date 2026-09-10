@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Absence;
+use App\Entity\Trainee;
 use App\Form\AbsenceType;
 use App\Repository\AbsenceRepository;
 use App\Repository\TraineeRepository;
