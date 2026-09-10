@@ -213,13 +213,69 @@ final class TraineeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_trainee_delete', methods: ['POST'])]
-    public function delete(Request $request, Trainee $trainee, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete' . $trainee->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($trainee);
-            $entityManager->flush();
+    public function delete(
+        Request $request,
+        Trainee $trainee,
+        EntityManagerInterface $entityManager
+    ): Response {
+        if (!$this->isCsrfTokenValid(
+            'delete' . $trainee->getId(),
+            $request->getPayload()->getString('_token')
+        )) {
+            throw $this->createAccessDeniedException(
+                'Jeton CSRF invalide.'
+            );
         }
 
-        return $this->redirectToRoute('app_trainee_index', [], Response::HTTP_SEE_OTHER);
+        $photoFilename = $trainee->getPhotoFilename();
+
+        $proofFilenames = [];
+
+        foreach ($trainee->getAbsences() as $absence) {
+            if ($absence->getProofFilename()) {
+                $proofFilenames[] =
+                    $absence->getProofFilename();
+            }
+        }
+
+        $entityManager->remove($trainee);
+        $entityManager->flush();
+
+        if ($photoFilename) {
+            $photoPath =
+                $this->getParameter('kernel.project_dir')
+                . '/public/uploads/trainees/'
+                . $photoFilename;
+
+            if (is_file($photoPath)) {
+                unlink($photoPath);
+            }
+        }
+
+        $proofsDirectory =
+            $this->getParameter('kernel.project_dir')
+            . '/public/uploads/proofs';
+
+        foreach ($proofFilenames as $proofFilename) {
+            $proofPath =
+                $proofsDirectory
+                . '/'
+                . $proofFilename;
+
+            if (is_file($proofPath)) {
+                unlink($proofPath);
+            }
+        }
+
+        $this->addFlash(
+            'success',
+            'Le stagiaire a bien été supprimé.'
+        );
+
+        return $this->redirectToRoute(
+            'app_trainee_index',
+            [],
+            Response::HTTP_SEE_OTHER
+        );
     }
 }

@@ -104,6 +104,26 @@
                                     >
                                         Modifier
                                     </a>
+
+                                    <form
+                                        method="post"
+                                        action="{{ path('app_trainee_delete', {'id': trainee.id}) }}"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Voulez-vous vraiment supprimer ce stagiaire ?');"
+                                    >
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value="{{ csrf_token('delete' ~ trainee.id) }}"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-danger"
+                                        >
+                                            Supprimer
+                                        </button>
+                                    </form>
                                 </td>
 
                             </tr>
