@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\AbsenceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -25,11 +26,30 @@ class Absence
     #[ORM\Column(name: 'absence_id', options: ['unsigned' => true])]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'absence_date', type: Types::DATE_IMMUTABLE)]
-    private ?\DateTimeImmutable $absenceDate = null;
+#[ORM\Column(name: 'absence_date', type: Types::DATE_IMMUTABLE)]
+#[Assert\NotNull(
+    message: 'La date de l\'absence est obligatoire.'
+)]
+private ?\DateTimeImmutable $absenceDate = null;
 
-    #[ORM\Column(name: 'reason', length: 30)]
-    private ?string $reason = null;
+#[ORM\Column(name: 'reason', length: 30)]
+#[Assert\NotBlank(
+    message: 'Le motif est obligatoire.'
+)]
+#[Assert\Choice(
+    choices: [
+        'illness',
+        'unexcused',
+        'legal_leave',
+        'work_accident',
+    ],
+    message: 'Le motif sélectionné n\'est pas valide.'
+)]
+#[Assert\Length(
+    max: 30,
+    maxMessage: 'Le motif ne peut pas dépasser 30 caractères.'
+)]
+private ?string $reason = null;
 
     #[ORM\Column(name: 'proof_filename', length: 255, nullable: true)]
     private ?string $proofFilename = null;
