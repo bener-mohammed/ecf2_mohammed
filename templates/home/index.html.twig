@@ -17,15 +17,53 @@
                 </p>
             </div>
 
-            <button
-                class="btn btn-outline-primary"
-                type="button"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#statisticsOffcanvas"
-                aria-controls="statisticsOffcanvas"
-            >
-                Voir les statistiques
-            </button>
+            <div class="d-flex gap-2">
+            
+                {% if is_granted('ROLE_ADMIN') %}
+            
+                    <a
+                        href="{{ path('app_trainee_index') }}"
+                        class="btn btn-outline-secondary"
+                    >
+                        Gestion des stagiaires
+                    </a>
+            
+                    <a
+                        href="{{ path('app_absence_index') }}"
+                        class="btn btn-outline-secondary"
+                    >
+                        Gestion des absences
+                    </a>
+            
+                    <a
+                        href="{{ path('app_logout') }}"
+                        class="btn btn-outline-danger"
+                    >
+                        Se déconnecter
+                    </a>
+            
+                {% else %}
+            
+                    <a
+                        href="{{ path('app_login') }}"
+                        class="btn btn-outline-success"
+                    >
+                        Se connecter
+                    </a>
+            
+                {% endif %}
+            
+                <button
+                    class="btn btn-outline-primary"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#statisticsOffcanvas"
+                    aria-controls="statisticsOffcanvas"
+                >
+                    Voir les statistiques
+                </button>
+            
+            </div>
 
         </div>
 
