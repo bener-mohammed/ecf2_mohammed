@@ -16,6 +16,32 @@ class TraineeRepository extends ServiceEntityRepository
         parent::__construct($registry, Trainee::class);
     }
 
+    public function getAbsenceStatistics(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t.id AS traineeId')
+            ->addSelect('t.firstName AS firstName')
+            ->addSelect('t.lastName AS lastName')
+            ->addSelect('COUNT(a.id) AS totalAbsences')
+            ->addSelect(
+                'SUM(
+                CASE
+                    WHEN a.reason = :unexcused
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS unexcusedAbsences'
+            )
+            ->leftJoin('t.absences', 'a')
+            ->setParameter('unexcused', 'unexcused')
+            ->groupBy('t.id')
+            ->addGroupBy('t.firstName')
+            ->addGroupBy('t.lastName')
+            ->orderBy('totalAbsences', 'DESC')
+            ->addOrderBy('t.lastName', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+    }
     //    /**
     //     * @return Trainee[] Returns an array of Trainee objects
     //     */

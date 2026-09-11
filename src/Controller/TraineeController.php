@@ -17,10 +17,24 @@ use Symfony\Component\Routing\Attribute\Route;
 final class TraineeController extends AbstractController
 {
     #[Route(name: 'app_trainee_index', methods: ['GET'])]
-    public function index(TraineeRepository $traineeRepository): Response
-    {
+    public function index(
+        TraineeRepository $traineeRepository
+    ): Response {
+        $trainees = $traineeRepository->findAll();
+
+        $statistics = $traineeRepository
+            ->getAbsenceStatistics();
+
+        $unexcusedCounts = [];
+
+        foreach ($statistics as $statistic) {
+            $unexcusedCounts[$statistic['traineeId']] =
+                (int) $statistic['unexcusedAbsences'];
+        }
+
         return $this->render('trainee/index.html.twig', [
-            'trainees' => $traineeRepository->findAll(),
+            'trainees' => $trainees,
+            'unexcusedCounts' => $unexcusedCounts,
         ]);
     }
 

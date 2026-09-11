@@ -72,10 +72,21 @@
                                 </td>
 
                                 <td>
-                                    <strong>
+                                    <strong
+                                        {% if (unexcusedCounts[trainee.id] ?? 0) > 5 %}
+                                            class="text-danger"
+                                        {% endif %}
+                                    >
                                         {{ trainee.firstName }}
                                         {{ trainee.lastName }}
                                     </strong>
+                                
+                                    {% if (unexcusedCounts[trainee.id] ?? 0) > 5 %}
+                                        <div class="small text-danger">
+                                            {{ unexcusedCounts[trainee.id] }}
+                                            absences sans motif
+                                        </div>
+                                    {% endif %}
                                 </td>
 
                                 <td>

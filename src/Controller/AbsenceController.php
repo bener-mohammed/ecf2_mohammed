@@ -27,15 +27,27 @@ final class AbsenceController extends AbstractController
         methods: ['GET']
     )]
     public function index(
-        AbsenceRepository $absenceRepository
+        AbsenceRepository $absenceRepository,
+        TraineeRepository $traineeRepository
     ): Response {
         $absences = $absenceRepository->findBy(
             [],
             ['absenceDate' => 'DESC']
         );
 
+        $statistics = $traineeRepository
+            ->getAbsenceStatistics();
+
+        $unexcusedCounts = [];
+
+        foreach ($statistics as $statistic) {
+            $unexcusedCounts[$statistic['traineeId']] =
+                (int) $statistic['unexcusedAbsences'];
+        }
+
         return $this->render('absence/index.html.twig', [
             'absences' => $absences,
+            'unexcusedCounts' => $unexcusedCounts,
         ]);
     }
 

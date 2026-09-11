@@ -6,13 +6,29 @@
     <main class="container py-4">
 
         <div class="d-flex justify-content-between align-items-center mb-4">
+
             <div>
-                <h1 class="h2 mb-1">Trombinoscope des stagiaires</h1>
+                <h1 class="h2 mb-1">
+                    Trombinoscope des stagiaires
+                </h1>
+
                 <p class="text-body-secondary mb-0">
                     {{ trainees|length }} stagiaires
                 </p>
             </div>
+
+            <button
+                class="btn btn-outline-primary"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#statisticsOffcanvas"
+                aria-controls="statisticsOffcanvas"
+            >
+                Voir les statistiques
+            </button>
+
         </div>
+
 
         <div class="row g-4">
 
@@ -49,15 +65,28 @@
 
                             {% endif %}
 
-                            <h2 class="h5 card-title mb-1">
+
+                            <h2
+                                class="h5 card-title mb-1
+                                    {% if is_granted('ROLE_ADMIN')
+                                        and (unexcusedCounts[trainee.id] ?? 0) > 5
+                                    %}
+                                        text-danger fw-bold
+                                    {% endif %}
+                                "
+                            >
                                 {{ trainee.firstName }}
                                 {{ trainee.lastName }}
                             </h2>
 
+
                             <p class="text-body-secondary small mb-0">
                                 ID AFPA : {{ trainee.afpaId }}
                             </p>
+
+
                             {% if is_granted('ROLE_ADMIN') %}
+
                                 <div class="mt-3">
                                     <a
                                         href="{{ path('app_absence_new', {'id': trainee.id}) }}"
@@ -66,6 +95,7 @@
                                         Ajouter une absence
                                     </a>
                                 </div>
+
                             {% endif %}
 
                         </div>
@@ -87,4 +117,121 @@
         </div>
 
     </main>
+
+
+    <div
+        class="offcanvas offcanvas-end"
+        tabindex="-1"
+        id="statisticsOffcanvas"
+        aria-labelledby="statisticsOffcanvasLabel"
+    >
+
+        <div class="offcanvas-header">
+
+            <h2
+                class="offcanvas-title h5"
+                id="statisticsOffcanvasLabel"
+            >
+                Statistiques des absences
+            </h2>
+
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Fermer"
+            ></button>
+
+        </div>
+
+
+        <div class="offcanvas-body">
+
+            <p class="text-body-secondary small">
+                Classement selon le nombre total de jours d'absence.
+            </p>
+
+
+            {% if statistics is not empty %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-sm align-middle">
+
+                        <thead>
+                            <tr>
+                                <th>Stagiaire</th>
+                                <th class="text-center">
+                                    Abs.
+                                </th>
+                                <th class="text-end">
+                                    Perte
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for statistic in statistics %}
+
+                                <tr>
+
+                                    <td>
+                                        <span
+                                            {% if statistic.unexcusedAbsences > 5 %}
+                                                class="text-danger fw-bold"
+                                            {% endif %}
+                                        >
+                                            {{ statistic.firstName }}
+                                            {{ statistic.lastName }}
+                                        </span>
+
+                                        {% if statistic.unexcusedAbsences > 5 %}
+                                            <div class="small text-danger">
+                                                {{ statistic.unexcusedAbsences }}
+                                                sans motif
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+                                    <td class="text-center">
+                                        {{ statistic.totalAbsences }}
+                                    </td>
+
+                                    <td class="text-end">
+                                        {{ statistic.lostIncome
+                                            |number_format(2, ',', ' ')
+                                        }}
+                                        €
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-info">
+                    Aucune statistique disponible.
+                </div>
+
+            {% endif %}
+
+            <hr>
+
+            <p class="small text-body-secondary mb-0">
+                Estimation basée sur 712 € par mois
+                pour 21 jours ouvrés.
+            </p>
+
+        </div>
+
+    </div>
+
 {% endblock %}
