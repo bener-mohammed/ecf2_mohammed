@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Repository\AbsenceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -11,6 +12,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\UniqueConstraint(
     name: 'uq_absence_trainee_date',
     columns: ['trainee_id', 'absence_date']
+)]
+#[UniqueEntity(
+    fields: ['trainee', 'absenceDate'],
+    message: 'Une absence existe déjà pour ce stagiaire à cette date.',
+    errorPath: 'absenceDate'
 )]
 class Absence
 {
