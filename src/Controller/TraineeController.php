@@ -25,16 +25,15 @@ final class TraineeController extends AbstractController
         $statistics = $traineeRepository
             ->getAbsenceStatistics();
 
-        $unexcusedCounts = [];
+        $statisticsByTrainee = [];
 
         foreach ($statistics as $statistic) {
-            $unexcusedCounts[$statistic['traineeId']] =
-                (int) $statistic['unexcusedAbsences'];
+            $statisticsByTrainee[$statistic['traineeId']] = $statistic;
         }
 
         return $this->render('trainee/index.html.twig', [
             'trainees' => $trainees,
-            'unexcusedCounts' => $unexcusedCounts,
+            'statisticsByTrainee' => $statisticsByTrainee,
         ]);
     }
 

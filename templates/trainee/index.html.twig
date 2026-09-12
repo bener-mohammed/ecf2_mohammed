@@ -73,7 +73,10 @@
 
                                 <td>
                                     <strong
-                                        {% if (unexcusedCounts[trainee.id] ?? 0) > 5 %}
+                                        {% if
+                                            statisticsByTrainee[trainee.id] is defined
+                                            and statisticsByTrainee[trainee.id].unexcusedAbsences > 5
+                                        %}
                                             class="text-danger"
                                         {% endif %}
                                     >
@@ -81,9 +84,12 @@
                                         {{ trainee.lastName }}
                                     </strong>
                                 
-                                    {% if (unexcusedCounts[trainee.id] ?? 0) > 5 %}
+                                    {% if
+                                        statisticsByTrainee[trainee.id] is defined
+                                        and statisticsByTrainee[trainee.id].unexcusedAbsences > 5
+                                    %}
                                         <div class="small text-danger">
-                                            {{ unexcusedCounts[trainee.id] }}
+                                            {{ statisticsByTrainee[trainee.id].unexcusedAbsences }}
                                             absences sans motif
                                         </div>
                                     {% endif %}

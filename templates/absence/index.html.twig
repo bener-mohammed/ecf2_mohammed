@@ -40,7 +40,13 @@
                     <tbody>
 
                         {% for absence in absences %}
+                            {% set statistic = statisticsByTrainee[absence.trainee.id]|default(null) %}
 
+                            {% set unexcusedCount =
+                                statistic
+                                    ? statistic.unexcusedAbsences
+                                    : 0
+                            %}
                             <tr>
                                 <td>
                                     {{ absence.absenceDate|date('d/m/Y') }}
@@ -48,20 +54,11 @@
 
                                 <td>
                                     <strong
-                                        {% if (unexcusedCounts[absence.trainee.id] ?? 0) > 5 %}
-                                            class="text-danger"
-                                        {% endif %}
+                                        class="{% if unexcusedCount > 5 %}text-danger fw-bold{% endif %}"
                                     >
                                         {{ absence.trainee.firstName }}
                                         {{ absence.trainee.lastName }}
                                     </strong>
-                                
-                                    {% if (unexcusedCounts[absence.trainee.id] ?? 0) > 5 %}
-                                        <div class="small text-danger">
-                                            {{ unexcusedCounts[absence.trainee.id] }}
-                                            absences sans motif
-                                        </div>
-                                    {% endif %}
                                 </td>
 
                                 <td>

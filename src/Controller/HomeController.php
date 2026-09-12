@@ -30,10 +30,16 @@ final class HomeController extends AbstractController
 
         unset($statistic);
 
+        $statisticsByTrainee = [];
+
+        foreach ($statistics as $statistic) {
+            $statisticsByTrainee[$statistic['traineeId']] = $statistic;
+        }
+
         return $this->render('home/index.html.twig', [
             'trainees' => $trainees,
             'statistics' => $statistics,
-            'unexcusedCounts' => $unexcusedCounts,
+            'statisticsByTrainee' => $statisticsByTrainee,
         ]);
     }
 }
